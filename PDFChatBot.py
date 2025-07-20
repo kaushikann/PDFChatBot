@@ -17,7 +17,7 @@ if uploaded_pdf is not None:
     text=""
     for page in pdf_reader.pages:
         text=page.extract_text()
-        text=text.append(text)
+        text=text.join(text)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     chunks = text_splitter.split_documents(text)
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
