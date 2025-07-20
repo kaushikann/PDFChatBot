@@ -18,7 +18,7 @@ if uploaded_pdf is not None:
     st.write("1")
     for page in pdf_reader.pages:
         text=text+page.extract_text()
-        text="\n".join(text)
+        text=" ".join(text)
         st.write("2")
     st.write(text)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
