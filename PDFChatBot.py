@@ -20,6 +20,7 @@ if uploaded_pdf is not None:
         text=text+page.extract_text()
         text="\n".join(text)
         st.write("2")
+    st.write(text)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     st.write("3")
     doc=text_splitter.create_documents([text])
