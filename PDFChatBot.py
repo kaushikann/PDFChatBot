@@ -27,7 +27,7 @@ if uploaded_pdf is not None:
     st.write(chunks)
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     st.write("6")
-    index=pdfchatbot
+    index="pdfchatbot"
     vectorstore = PineconeVectorStore(chunks, embeddings, index_name=index)
     st.write("7")
     llm=ChatOpenAI(model="gpt-4o-mini", temperature=0)
