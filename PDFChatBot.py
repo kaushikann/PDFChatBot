@@ -24,7 +24,7 @@ if uploaded_pdf is not None:
     doc=text_splitter.create_documents([text])
     st.write(doc)
     chunks = text_splitter.split_documents(doc)
-    st.write("5")
+    st.write(chunks)
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     st.write("6")
     vectorstore = PineconeVectorStore(index_name="pdfchatbot", embedding=OpenAIEmbeddings())
