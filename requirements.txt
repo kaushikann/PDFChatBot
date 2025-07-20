@@ -6,4 +6,4 @@ langchain-community
 streamlit
 pypdf
 openai
-pinecone-client 
+pinecone
