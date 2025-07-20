@@ -15,16 +15,14 @@ uploaded_pdf=st.file_uploader(label="Upload a PDF", type="pdf", accept_multiple_
 if uploaded_pdf is not None:
     pdf_reader=PdfReader(uploaded_pdf)
     text=""
-    st.write("1")
     for page in pdf_reader.pages:
         text=text+page.extract_text()
         text=" ".join(text)
-        st.write("2")
     st.write(text)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    st.write("3")
+    st.write(text_splitter)
     doc=text_splitter.create_documents([text])
-    st.write("4")
+    st.write(doc)
     chunks = text_splitter.split_documents(doc)
     st.write("5")
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
