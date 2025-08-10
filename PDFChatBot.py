@@ -18,20 +18,13 @@ if uploaded_pdf is not None:
     for page in pdf_reader.pages:
         text=text+page.extract_text()
         text=" ".join(text)
-    st.write(text)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    st.write(text_splitter)
     doc=text_splitter.create_documents([text])
-    st.write(doc)
     chunks = text_splitter.split_documents(doc)
-    st.write(chunks)
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    st.write("6")
     index="pdfchatbot"
-    vectorstore = PineconeVectorStore(chunks, embeddings, index_name=index)
-    st.write("7")
+    vectorstore = PineconeVectorStore.from_documents(chunks, embeddings, index_name=index)
     llm=ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    st.write("8")
     qa=RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=vectorstore.as_retriever())
     st.write("9")
     user_query=st.text_input("Enter your query")
@@ -40,10 +33,3 @@ if uploaded_pdf is not None:
         st.write(qa.invoke({"query": user_query}))
     else:
         st.write("Please upload a PDF file")
-
-
-
-
-
-
-
