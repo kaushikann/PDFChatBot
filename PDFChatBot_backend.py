@@ -43,11 +43,13 @@ class PDFChatBotBackend:
             # Clean and split text
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
             chunks = text_splitter.split_text(text)
-            
+            # Convert text chunks to Document objects
+            from langchain.schema import Document
+            documents = [Document(page_content=chunk) for chunk in chunks]            
             # Create embeddings and vector store
             embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
             index = "pdfchatbot"
-            self.vectorstore = PineconeVectorStore.from_documents(chunks, embeddings, index_name=index)
+            self.vectorstore = PineconeVectorStore.from_documents(documents, embeddings, index_name=index)
             
             # Initialize LLM and QA chain
             llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
@@ -79,6 +81,7 @@ class PDFChatBotBackend:
     def is_ready(self):
         """Check if the backend is ready to process queries"""
         return self.is_initialized and self.qa_chain is not None
+
 
 
 
