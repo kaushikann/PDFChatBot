@@ -22,7 +22,7 @@ class PDFChatBotBackend:
     def initialize_memory(self):
         """Initialize conversation memory"""
         if "memory" not in st.session_state:
-            st.session_state["memory"] = ConversationalBufferMemory(
+            st.session_state["memory"] = ConversationBufferMemory(
                 memory_key="chat_history",
                 return_messages=True
             )
@@ -79,6 +79,7 @@ class PDFChatBotBackend:
     def is_ready(self):
         """Check if the backend is ready to process queries"""
         return self.is_initialized and self.qa_chain is not None
+
 
 
 
