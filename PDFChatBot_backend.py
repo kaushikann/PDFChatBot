@@ -1,5 +1,5 @@
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore
+from langchain_community.vectorstores import Pinecone
 import os
 import streamlit as st
 from langchain.chains import ConversationalRetrievalChain
@@ -24,7 +24,8 @@ class PDFChatBotBackend:
         if "memory" not in st.session_state:
             st.session_state["memory"] = ConversationBufferMemory(
                 memory_key="chat_history",
-                return_messages=True
+                return_messages=True,
+                output_key="answer"
             )
         self.memory = st.session_state["memory"]
     
@@ -51,7 +52,7 @@ class PDFChatBotBackend:
             # Create embeddings and vector store
             embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
             index = "pdfchatbot"
-            self.vectorstore = PineconeVectorStore.from_documents(documents, embeddings, index_name=index)
+            self.vectorstore = Pinecone.from_documents(documents, embeddings, index_name=index)
             
             # Initialize LLM and QA chain
             llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
