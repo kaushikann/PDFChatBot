@@ -6,7 +6,7 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from pypdf import PdfReader
-from langchain import ConversationalBufferMemory
+from langchain.chains.conversation.memory import ConversationalBufferMemory
 
 # Set environment variables
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
@@ -79,3 +79,4 @@ class PDFChatBotBackend:
     def is_ready(self):
         """Check if the backend is ready to process queries"""
         return self.is_initialized and self.qa_chain is not None
+
