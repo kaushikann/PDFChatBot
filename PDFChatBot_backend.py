@@ -42,7 +42,7 @@ class PDFChatBotBackend:
             
             # Clean and split text
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-            chunks = text_splitter.split_documents([text])
+            chunks = text_splitter.split_text(text)
             
             # Create embeddings and vector store
             embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
@@ -79,6 +79,7 @@ class PDFChatBotBackend:
     def is_ready(self):
         """Check if the backend is ready to process queries"""
         return self.is_initialized and self.qa_chain is not None
+
 
 
 
