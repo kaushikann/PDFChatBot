@@ -57,7 +57,8 @@ class PDFChatBotBackend:
                 llm=llm,
                 retriever=self.vectorstore.as_retriever(),
                 memory=self.memory,
-                return_source_documents=True
+                return_source_documents=True,
+                output_key="answer"
             )
             
             self.is_initialized = True
@@ -81,6 +82,7 @@ class PDFChatBotBackend:
     def is_ready(self):
         """Check if the backend is ready to process queries"""
         return self.is_initialized and self.qa_chain is not None
+
 
 
 
