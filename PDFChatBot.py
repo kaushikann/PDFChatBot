@@ -14,6 +14,10 @@ backend.initialize_memory()
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
+# Initialize input key for clearing text input
+if "input_key" not in st.session_state:
+    st.session_state["input_key"] = 0
+
 # UI Components
 st.title(":blue[PDF Chat Bot]")
 st.write("Upload a PDF file and chat with it. Please note that we will not store any of your data after you close the browser.")
@@ -89,7 +93,7 @@ with input_container:
         # Chat input with better styling
         user_query = st.text_input(
             "💬 Type your message here...", 
-            key="user_input", 
+            key=f"user_input_{st.session_state['input_key']}", 
             placeholder="Ask a question about the PDF...",
             label_visibility="collapsed"
         )
@@ -100,6 +104,7 @@ with input_container:
                 with st.spinner("🤔 Thinking..."):
                     bot_response = backend.get_response(user_query)
                 st.session_state["chat_history"].append((user_query, bot_response))
+                st.session_state["input_key"] += 1 # Increment key to clear input
                 # Rerun to show the new message
                 st.rerun()
             else:
