@@ -1,8 +1,5 @@
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore
 import pinecone
 import os
-from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 import streamlit as st
 from langchain.chains import ConversationalRetrievalChain
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -79,10 +76,12 @@ class PDFChatBotBackend:
             documents = [Document(page_content=chunk) for chunk in chunks]
             
             # Create embeddings and vector store
+            from langchain_openai import OpenAIEmbeddings
             embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
             index = "pdfchatbot"
             
             # Use PineconeVectorStore with the new Pinecone SDK
+            from langchain_pinecone import PineconeVectorStore
             self.vectorstore = PineconeVectorStore.from_documents(
                 documents, 
                 embeddings, 
@@ -90,37 +89,15 @@ class PDFChatBotBackend:
             )
             
             # Initialize LLM and QA chain
+            from langchain_openai import ChatOpenAI
             llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-            # System message template
-            system_template = """You are a helpful PDF analysis assistant. Your role is to:
-
-1. **Answer questions accurately** based on the PDF content provided
-2. **Be concise and clear** in your responses
-3. **Cite specific information** from the PDF when possible
-4. **Stay on topic** and only answer questions related to the PDF content. If you don't know the answer reply "I don't know. Ask me something from the PDF."
-5. **Be professional and helpful** in your tone
-6. **Format responses** in a readable way with proper spacing and structure
-7. **Ask for clarification** if a question is unclear
-
-Remember: Only use information from the uploaded PDF to answer questions.
-
-Context: {context}
-Question: {question}
-Chat History: {chat_history}"""
-
-            # Create the prompt template
-            prompt = ChatPromptTemplate.from_messages([
-                SystemMessagePromptTemplate.from_template(system_template),
-                HumanMessagePromptTemplate.from_template("{question}")
-            ])
             
             self.qa_chain = ConversationalRetrievalChain.from_llm(
                 llm=llm,
                 retriever=self.vectorstore.as_retriever(),
                 memory=self.memory,
                 return_source_documents=True,
-                output_key="answer",
-                combine_docs_chain_kwargs={"prompt": prompt}
+                output_key="answer"
             )
             
             self.is_initialized = True
