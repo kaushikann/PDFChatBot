@@ -22,6 +22,18 @@ class PDFChatBotBackend:
         self.qa_chain = None
         self.memory = None
         self.is_initialized = False
+        self.clear_pinecone_namespace()
+    
+    def clear_pinecone_namespace(self):
+        """Clear all vectors from the Pinecone index namespace"""
+        try:
+            index = "pdfchatbot"
+            # Get the index if it exists
+            if index in pc.list_indexes().names():
+                # Delete all vectors from the index
+                pc.Index(index).delete(delete_all=True)
+        except Exception as e:
+            print(f"Error clearing Pinecone namespace: {str(e)}")
     
     def initialize_memory(self):
         """Initialize conversation memory"""
@@ -66,12 +78,27 @@ class PDFChatBotBackend:
             
             # Initialize LLM and QA chain
             llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+            
+            # Add system instructions to guide the bot's behavior
+            system_instructions = """You are a helpful PDF analysis assistant. Your role is to:
+
+1. **Answer questions accurately** based on the PDF content provided
+2. **Be concise and clear** in your responses
+3. **Cite specific information** from the PDF when possible
+4. **Stay on topic** and only answer questions related to the PDF content. If you don't know the answer reply "I don't know. Ask me something from the PDF."
+5. **Be professional and helpful** in your tone
+6. **Format responses** in a readable way with proper spacing and structure
+7. **Ask for clarification** if a question is unclear
+
+Remember: Only use information from the uploaded PDF to answer questions."""
+            
             self.qa_chain = ConversationalRetrievalChain.from_llm(
                 llm=llm,
                 retriever=self.vectorstore.as_retriever(),
                 memory=self.memory,
                 return_source_documents=True,
-                output_key="answer"
+                output_key="answer",
+                system_message=system_instructions
             )
             
             self.is_initialized = True
