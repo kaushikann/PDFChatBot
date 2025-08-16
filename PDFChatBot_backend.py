@@ -27,11 +27,23 @@ class PDFChatBotBackend:
     def clear_pinecone_namespace(self):
         """Clear all vectors from the Pinecone index namespace"""
         try:
-            index = "pdfchatbot"
-            # Get the index if it exists
-            if index in pc.list_indexes().names():
-                # Delete all vectors from the index
-                pc.Index(index).delete(delete_all=True)
+            index_name = "pdfchatbot"
+            
+            # Check if index exists
+            if index_name in pc.list_indexes().names():
+                # Get the index
+                index = pc.Index(index_name)
+                
+                # Get current stats to see how many vectors exist
+                stats = index.describe_index_stats()
+                total_vectors = stats.total_vector_count
+                
+                if total_vectors > 0:
+                    # Delete all vectors using the delete method
+                    index.delete(delete_all=True)
+            else:
+                print(f"Index {index_name} does not exist yet")
+                
         except Exception as e:
             print(f"Error clearing Pinecone namespace: {str(e)}")
     
