@@ -6,9 +6,10 @@ streamlit
 pypdf
 openai
 langchain-pinecone>=0.1.0
-pinecone-client
+pinecone
 langchain-pinecone
 python-dotenv
 requests
 typing-extensions
+
 
