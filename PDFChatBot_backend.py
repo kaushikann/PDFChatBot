@@ -13,8 +13,8 @@ from langchain.memory import ConversationBufferMemory
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 os.environ["PINECONE_API_KEY"] = st.secrets["PINECONE_API_KEY"]
 
-# Initialize Pinecone
-pinecone.init(api_key=os.environ["PINECONE_API_KEY"], environment="gcp-starter")
+# Initialize Pinecone using the new class-based approach
+pc = pinecone.Pinecone(api_key=os.environ["PINECONE_API_KEY"])
 
 class PDFChatBotBackend:
     def __init__(self):
@@ -22,6 +22,7 @@ class PDFChatBotBackend:
         self.qa_chain = None
         self.memory = None
         self.is_initialized = False
+        self.pc = pc  # Store Pinecone instance
     
     def initialize_memory(self):
         """Initialize conversation memory"""
@@ -56,7 +57,14 @@ class PDFChatBotBackend:
             # Create embeddings and vector store
             embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
             index = "pdfchatbot"
-            self.vectorstore = Pinecone.from_documents(documents, embeddings, index_name=index)
+            
+            # Use PineconeVectorStore with the new Pinecone instance
+            self.vectorstore = PineconeVectorStore.from_documents(
+                documents, 
+                embeddings, 
+                index_name=index,
+                pinecone_client=self.pc
+            )
             
             # Initialize LLM and QA chain
             llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
