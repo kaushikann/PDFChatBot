@@ -22,7 +22,6 @@ class PDFChatBotBackend:
         self.qa_chain = None
         self.memory = None
         self.is_initialized = False
-        self.pc = pc  # Store Pinecone instance
     
     def initialize_memory(self):
         """Initialize conversation memory"""
@@ -58,12 +57,11 @@ class PDFChatBotBackend:
             embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
             index = "pdfchatbot"
             
-            # Use PineconeVectorStore with the new Pinecone instance
+            # Use PineconeVectorStore with the new Pinecone SDK
             self.vectorstore = PineconeVectorStore.from_documents(
                 documents, 
                 embeddings, 
-                index_name=index,
-                pinecone_client=self.pc
+                index_name=index
             )
             
             # Initialize LLM and QA chain
