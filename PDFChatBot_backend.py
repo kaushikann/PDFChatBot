@@ -2,6 +2,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 import pinecone
 import os
+from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 import streamlit as st
 from langchain.chains import ConversationalRetrievalChain
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -90,9 +91,8 @@ class PDFChatBotBackend:
             
             # Initialize LLM and QA chain
             llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-            
-            # Add system instructions to guide the bot's behavior
-            system_instructions = """You are a helpful PDF analysis assistant. Your role is to:
+            # System message template
+            system_template = """You are a helpful PDF analysis assistant. Your role is to:
 
 1. **Answer questions accurately** based on the PDF content provided
 2. **Be concise and clear** in your responses
@@ -102,7 +102,17 @@ class PDFChatBotBackend:
 6. **Format responses** in a readable way with proper spacing and structure
 7. **Ask for clarification** if a question is unclear
 
-Remember: Only use information from the uploaded PDF to answer questions."""
+Remember: Only use information from the uploaded PDF to answer questions.
+
+Context: {context}
+Question: {question}
+Chat History: {chat_history}"""
+
+            # Create the prompt template
+            prompt = ChatPromptTemplate.from_messages([
+                SystemMessagePromptTemplate.from_template(system_template),
+                HumanMessagePromptTemplate.from_template("{question}")
+            ])
             
             self.qa_chain = ConversationalRetrievalChain.from_llm(
                 llm=llm,
@@ -110,7 +120,7 @@ Remember: Only use information from the uploaded PDF to answer questions."""
                 memory=self.memory,
                 return_source_documents=True,
                 output_key="answer",
-                system_message=system_instructions
+                combine_docs_chain_kwargs={"prompt": prompt}
             )
             
             self.is_initialized = True
