@@ -11,6 +11,3 @@ langchain-pinecone
 python-dotenv
 requests
 typing-extensions
-pinecone-client
-
-
